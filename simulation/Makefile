@@ -1,12 +1,30 @@
-CC=gcc
-CFLAGS=-Wall -O2 -Iinclude
+# Compiler
+CC = gcc
+CFLAGS = -Wall -Wextra -O2 -Iinclude
 
-OBJS=src/vga.o src/bmp.o src/font.o src/main.o
+# Source files
+SRC = src/main.c src/vga.c src/font.c src/bmp.c
 
-all: sim
+# Object files
+OBJ = $(SRC:.c=.o)
 
-sim: $(OBJS)
-	$(CC) $(CFLAGS) -o sim $(OBJS)
+# Executable
+TARGET = vga_sim
 
+# Default target
+all: $(TARGET)
+
+# Link object files
+$(TARGET): $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $(OBJ)
+
+# Compile C files to object files
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Clean
 clean:
-	rm -f sim $(OBJS)
+	rm -f $(OBJ) $(TARGET) output.bmp
+
+# Phony targets
+.PHONY: all clean
