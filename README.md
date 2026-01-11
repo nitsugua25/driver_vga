@@ -564,5 +564,3 @@ This project demonstrates:
 **Key achievement**: We built an OS kernel from scratch that controls hardware!
 
 ---
-
-*Good luck with your exam! 🚀*
