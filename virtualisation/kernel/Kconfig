@@ -1,3 +1,0 @@
-config VGA_VIRT
-    bool "Enable VGA virtualization"
-    default y

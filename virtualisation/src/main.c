@@ -1,39 +1,33 @@
-#include <stdio.h>
-#include "pci.h"
-#include "framebuffer.h"
 #include "vga.h"
+#include "pci.h"
 
-int main() {
+void kernel_main(void) {
+    // Initialize VGA text mode
+    vga_init_text();
+    
+    // Clear screen
+    vga_clear();
+    
+    // Display header
+    vga_write_text(0, 0, "VGA DRIVER   OS PROJECT", VGA_COLOR(VGA_WHITE, VGA_BLUE));
+    
+    // Display messages
+    vga_write_text(2, 5, "HELLO FROM KERNEL", VGA_COLOR(VGA_LIGHT_GREEN, VGA_BLACK));
+    vga_write_text(4, 5, "TEXT MODE WORKING", VGA_COLOR(VGA_YELLOW, VGA_BLACK));
+    
+    // Scan PCI for VGA device
     pci_device_t vga_dev;
-    framebuffer_t fb;
-
-    // Scan PCI to find VGA device
-    if (pci_scan_vga(&vga_dev) != 0) {
-        printf("VGA device not found!\n");
-        return 1;
+    if (pci_scan_vga(&vga_dev) == 0) {
+        vga_write_text(6, 5, "PCI VGA FOUND", VGA_COLOR(VGA_LIGHT_CYAN, VGA_BLACK));
+        vga_write_text(7, 7, "BUS SCAN COMPLETE", VGA_COLOR(VGA_WHITE, VGA_BLACK));
+    } else {
+        vga_write_text(6, 5, "PCI SCAN COMPLETE", VGA_COLOR(VGA_LIGHT_CYAN, VGA_BLACK));
     }
-
-    printf("VGA detected: vendor=0x%x device=0x%x BAR0=0x%x\n",
-           vga_dev.vendor_id, vga_dev.device_id, vga_dev.bar0);
-
-    //  Initialize real framebuffer via BAR
-    // Text mode 25x80
-    framebuffer_init(&fb, vga_dev.bar0, VGA_TEXT_COLS, VGA_TEXT_ROWS);
-
-    // ️ Display text on the real framebuffer
-    vga_init_text(&fb); // Clear screen
-    vga_write_text(0, 0, "HELLO TEXT MODE", 0x0F, &fb); // white on black
-    vga_write_text(1, 0, "VGA VIRTUALIZATION", 0x0F, &fb);
-
-    // Switch to graphics mode 640x480
-    framebuffer_init(&fb, vga_dev.bar0, 640, 480);
-
-    // Draw text in graphics mode using font
-    vga_draw_string(&fb, 50, 50, "HELLO GRAPHICS");
-    vga_draw_string(&fb, 50, 70, "A-Z FONT TEST");
-
-    printf("Text and graphics written to VGA framebuffer.\n");
-
-    // In a real kernel, the program would continue running here
-    return 0;
+    
+    vga_write_text(10, 5, "KERNEL LOADED SUCCESSFULLY", VGA_COLOR(VGA_LIGHT_MAGENTA, VGA_BLACK));
+    
+    // Kernel loop
+    while(1) {
+        __asm__ volatile ("hlt");
+    }
 }

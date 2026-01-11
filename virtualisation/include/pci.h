@@ -12,7 +12,7 @@ typedef struct {
     uint32_t bar0;
 } pci_device_t;
 
-// Scan PCI bus for VGA devices and fill pci_device_t
+/* Scan PCI bus for VGA device */
 int pci_scan_vga(pci_device_t *dev);
 
 #endif
